@@ -1,0 +1,40 @@
+      <div class="relative group modal-item">
+
+      <div class="relative grid max-w-lg flex-col items-end justify-center overflow-hidden rounded-lg bg-white group-hover:shadow-lg image-box cursor-pointer"
+          onClick="onImageClicked('{{ inner.id }}', '{{ inner.prompt|escapejs }}', '{{ inner.cn_prompt|escapejs }}', [ {% for image in inner.images.all %} '{{ image.image.url }}', {% endfor %} ], {'id': '{{inner.author.id}}', 'name': '{{inner.author}}', {% if inner.author.user %}'user': { 'id': '{{ inner.author.user.id }}', 'name': '{{ inner.author.user.profile.nickname }}', 'avatar': '{{ inner.author.user.profile.avatar.url }}' } {% endif %} }, '{{ inner.updated_at }}', '{{ inner.views }}', '{{ inner.likes }}', '{{ inner.copy_count }}', '{{ inner.category }}', '{{ inner.style }}', '{{ inner.software }}')"
+        data-item-id="{{ inner.id }}"
+        style="padding-bottom: 130%;"
+      >
+        {% with inner.images.first as first_image %}
+        <div class="overflow-hidden absolute inset-0 m-0 h-full w-full overflow-hidden rounded-none bg-transparent bg-[url('{{ first_image.thumbnail.url }}')] bg-cover bg-top scale-100 group-hover:scale-110 transition-transform duration-300">
+          <div class="to-bg-black-10 absolute inset-0 h-full w-full bg-gradient-to-t from-black/80 via-black/50 opacity-0 group-hover:opacity-90 transition-all ease-in-out duration-300"></div>
+        </div>
+        {% endwith %}
+        <div class="absolute text-left flex flex-col w-full h-full p-4 justify-end">
+          <h2 class="mb-1 text-2xl font-medium text-white hidden group-hover:block">
+            {{ inner.category }}
+          </h2>
+          <p class="mb-1 text-base text-slate-200 hidden group-hover:block">
+            {{ inner.style }}
+          </p>
+          <p class="mb-1 text-base text-slate-200 hidden group-hover:block">
+            {{ inner.software }}
+          </p>
+          <div class="flex items-center justify-between text-slate-200">
+              <div>
+              <img
+                src="{% if inner.author.user %}{{ inner.author.user.profile.avatar.url }}{% else %}/media/default.jpg{% endif %}"
+    alt="avatar"
+    class="relative inline-block h-9 w-9 !rounded-full  object-cover object-center mr-2 border border-white"
+  />
+            <span class="text-base font-semibold hidden group-hover:inline-block">{{ inner.author }}</span>
+              </div>
+              <div class="relative-date hidden group-hover:flex text-xs self-end">{{ inner.created_at | date:'Y-m-d H:i:s' }}</div>
+          </div>
+        </div>
+
+      </div>
+        <span class="absolute top-0.5 right-0.5 grid min-h-[28px] min-w-[28px] translate-x-2/4 -translate-y-2/4 place-items-center rounded-full bg-emerald-500 py-1 px-1 text-xs text-white border border-white hidden group-hover:grid">
+          {{ inner.images.count }}
+  </span>
+      </div>

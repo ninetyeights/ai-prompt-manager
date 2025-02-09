@@ -1,0 +1,386 @@
+{% extends 'base.html' %}
+
+{% block css %}
+    <link href="https://unpkg.com/filepond/dist/filepond.css" rel="stylesheet"/>
+    <link
+            href="https://unpkg.com/filepond-plugin-image-preview/dist/filepond-plugin-image-preview.css"
+            rel="stylesheet"
+    />
+    <style>
+        .errorlist {
+            color: red;
+            margin-bottom: 16px;
+        }
+    </style>
+{% endblock %}
+
+{% block content %}
+
+    {% if errors %}
+        {{ errors }}
+    {% endif %}
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        <div class="gap-2 grid grid-cols-2 mb-4">
+            <div>
+                <label for="{{ form.prompt.auto_id }}"
+                       class="flex text-sm font-medium text-gray-700">{{ form.prompt.label }}<span
+                        class="text-lg text-red-500 pl-2">*</span></label>
+                {{ form.prompt }}
+            </div>
+            <div>
+                <label for="{{ form.cn_prompt.auto_id }}"
+                       class="flex text-sm font-medium text-gray-700">{{ form.cn_prompt.label }}<span
+                        class="text-lg text-red-500 pl-2">*</span></label>
+                {{ form.cn_prompt }}
+            </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-2 mb-4">
+            <div>
+                <label class="flex text-sm font-medium text-gray-700">{{ form.category.label }}<span
+                        class="text-lg text-red-500 pl-2">*</span></label>
+                <div class="relative flex flex-col"> {#  rounded-xl bg-white shadow #}
+                    <nav class="flex flex-col gap-2 p-0"> {# min-w-[240px]  #}
+                        {% for category in form.category_choices %}
+                            <div
+                                    role="button"
+                                    class="{% if category.2 == 1 %}pl-6 {% else %}p-0 {% endif %}flex w-full items-center rounded-lg transition-all hover:bg-slate-100 focus:bg-slate-100 active:bg-slate-100"
+                            >
+                                <label
+                                        for="cate-id-{{ category.0 }}"
+                                        class="flex w-full cursor-pointer items-center"
+                                >
+                                    <div class="inline-flex items-center">
+                                        <label class="relative flex items-center cursor-pointer"
+                                               for="cate-id-{{ category.0 }}">
+                                            <input
+                                                    name="category"
+                                                    type="radio"
+                                                    class="peer h-5 w-5 cursor-pointer appearance-none rounded-full border border-slate-300 checked:border-slate-400 transition-all bg-white"
+                                                    id="cate-id-{{ category.0 }}"
+                                                    value="{{ category.0 }}"
+                                                    {% if form.category.value|stringformat:"s" == category.0|stringformat:"s" %}checked{% endif %}
+                                                    required
+                                            />
+                                            <span class="absolute bg-slate-800 w-3 h-3 rounded-full opacity-0 peer-checked:opacity-100 transition-opacity duration-200 top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2"></span>
+                                        </label>
+                                        <label class="ml-2 text-slate-600 cursor-pointer text-sm"
+                                               for="cate-id-{{ category.0 }}">
+                                            {{ category.1 }}
+                                        </label>
+                                    </div>
+                                </label>
+                            </div>
+                        {% endfor %}
+                    </nav>
+                </div>
+            </div>
+            <div>
+                <label for="{{ form.software.auto_id }}"
+                       class="flex text-sm font-medium text-gray-700">{{ form.software.label }}<span
+                        class="text-lg text-red-500 pl-2">*</span></label>
+                <div class="flex gap-2 flex-col">
+                    {% for value, label in form.fields.software.choices %}
+                        <div class="flex items-center">
+                            <label class="relative flex items-center cursor-pointer" for="software-id-{{ value }}">
+                                <input name="software" type="radio"
+                                       class="peer h-5 w-5 cursor-pointer appearance-none rounded-full border border-slate-300 checked:border-slate-400 transition-all bg-white"
+                                       id="software-id-{{ value }}"
+                                       value="{{ value }}"
+                                       required
+                                       {% if form.software.value|stringformat:"s" == value|stringformat:"s" %}checked{% endif %}>
+                                <span class="absolute bg-slate-800 w-3 h-3 rounded-full opacity-0 peer-checked:opacity-100 transition-opacity duration-200 top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2"></span>
+                            </label>
+                            <label class="ml-2 text-slate-600 cursor-pointer text-sm"
+                                   for="software-id-{{ value }}">{{ label }}</label>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <div>
+                <label for="{{ form.style.auto_id }}"
+                       class="flex text-sm font-medium text-gray-700">{{ form.style.label }}<span
+                        class="text-lg text-red-500 pl-2">*</span></label>
+                <div class="flex gap-2 flex-col">
+                    {% for value, label in form.fields.style.choices %}
+                        <div class="flex items-center">
+                            <label class="relative flex items-center cursor-pointer" for="style-id-{{ value }}">
+                                <input name="style" type="radio"
+                                       class="peer h-5 w-5 cursor-pointer appearance-none rounded-full border border-slate-300 checked:border-slate-400 transition-all bg-white"
+                                       id="style-id-{{ value }}"
+                                       value="{{ value }}"
+                                       required
+                                       {% if form.style.value|stringformat:"s" == value|stringformat:"s" %}checked{% endif %}>
+                                <span class="absolute bg-slate-800 w-3 h-3 rounded-full opacity-0 peer-checked:opacity-100 transition-opacity duration-200 top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2"></span>
+                            </label>
+                            <label class="ml-2 text-slate-600 cursor-pointer text-sm"
+                                   for="style-id-{{ value }}">{{ label }}</label>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <div>
+                <label for="{{ form.language.auto_id }}"
+                       class="flex text-sm font-medium text-gray-700">{{ form.language.label }}<span
+                        class="text-lg text-red-500 pl-2">*</span></label>
+                <div class="flex gap-2 flex-col">
+                    {% for value, label in form.fields.language.choices %}
+                        <div class="flex items-center">
+                            <label class="relative flex items-center cursor-pointer" for="language-id-{{ value }}">
+                                <input name="language" type="radio"
+                                       class="peer h-5 w-5 cursor-pointer appearance-none rounded-full border border-slate-300 checked:border-slate-400 transition-all bg-white"
+                                       id="language-id-{{ value }}"
+                                       value="{{ value }}"
+                                       {% if form.language.value == value %}checked{% endif %}>
+                                <span class="absolute bg-slate-800 w-3 h-3 rounded-full opacity-0 peer-checked:opacity-100 transition-opacity duration-200 top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2"></span>
+                            </label>
+                            <label class="ml-2 text-slate-600 cursor-pointer text-sm"
+                                   for="language-id-{{ value }}">{{ label }}</label>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+
+        <div class="mb-4">
+            <label for="{{ form.tags.auto_id }}"
+                   class="block text-sm font-medium text-gray-700 mb-2">{{ form.tags.label }}</label>
+            {{ form.tags }}
+        </div>
+
+        {#        {% if form.author %}#}
+        {#            <div class="mb-4">#}
+        {#                <label for="{{ form.author.auto_id }}"#}
+        {#                       class="block text-sm font-medium text-gray-700 mb-2">#}
+        {#                    {{ form.author.label }}{% if not request.user.is_superuser %}#}
+        {#                        <span class="ml-2 text-red-500 text-xs">只读</span>{% endif %}</label>#}
+        {#                {{ form.author }}#}
+        {#            </div>#}
+        {#        {% endif %}#}
+
+        {% if form.author and form.status %}
+            <div class="grid grid-cols-2 gap-2 mb-4">
+                <div>
+                    <label for="{{ form.author.auto_id }}"
+                           class="block text-sm font-medium text-gray-700 mb-2">
+                        {{ form.author.label }}{% if not request.user.is_superuser %}
+                            <span class="ml-2 text-red-500 text-xs">只读</span>{% endif %}</label>
+                    {{ form.author }}
+                </div>
+
+                <div>
+                    <label for="{{ form.status.auto_id }}"
+                           class="block text-sm font-medium text-gray-700 mb-2">
+                        {{ form.status.label }}{% if not request.user.is_superuser %}
+                            <span class="ml-2 text-red-500 text-xs">只读</span>{% endif %}</label>
+                    {{ form.status }}
+                </div>
+            </div>
+        {% endif %}
+
+        {% if request.user.is_superuser %}
+            <div class="mb-4{% if 'rejected' not in form.status.value %} hidden{% endif %}" id="rejectReason">
+                <div>
+                    <label for="{{ form.rejection_reason.auto_id }}"
+                           class="flex text-sm font-medium text-gray-700">{{ form.rejection_reason.label }}<span
+                            class="text-lg text-red-500 pl-2">*</span></label>
+                    {{ form.rejection_reason }}
+                </div>
+            </div>
+        {% endif %}
+
+
+        {#        <div class="border-t-2 border-gray-300 my-4"></div>#}
+        <h2 class="text-lg font-bold text-gray-700 mt-4">上传图片</h2>
+        {#        {{ formset.management_form }}  <!-- 必须包含管理表单以支持图片集 -->#}
+
+        <div>
+            <input id="neFilepond" type="file" hidden multiple name="image"/>
+        </div>
+
+        {#        <div class="space-y-4">#}
+        {#            {% for form in formset %}#}
+        {#                <div class="flex items-center space-x-4">#}
+        {#                    {{ form.image.label_tag }}:#}
+        {#                    {{ form.image }}  <!-- 渲染图片字段 -->#}
+        {#                    {% if form.DELETE %}#}
+        {#                        <label>{{ form.DELETE }} 删除</label>#}
+        {#                    {% endif %}#}
+        {#                </div>#}
+        {#            {% endfor %}#}
+        {#        </div>#}
+
+        {% for image in item.images.all %}
+            <input type="hidden" name="existing_image_names" value="{{ image.filename }}"/>
+        {% endfor %}
+
+        <button class="w-full rounded-md bg-slate-800 py-2 px-4 border border-transparent text-center text-sm text-white transition-all shadow-md hover:shadow-lg focus:bg-slate-700 focus:shadow-none active:bg-slate-700 hover:bg-slate-700 active:shadow-none disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none ml-2"
+                type="submit">
+            {% if pk %}更新{% else %}创建{% endif %}
+        </button>
+    </form>
+{% endblock %}
+
+{% block js %}
+    <script src="https://unpkg.com/@material-tailwind/html@latest/scripts/ripple.js"></script>
+    <script src="https://unpkg.com/filepond-plugin-image-preview/dist/filepond-plugin-image-preview.js"></script>
+    <script src="https://unpkg.com/filepond-plugin-file-validate-type/dist/filepond-plugin-file-validate-type.js"></script>
+    <script src="https://unpkg.com/filepond/dist/filepond.js"></script>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const statusSelect = document.querySelector('[name="status"]');
+            const rejectReason = document.getElementById("rejectReason");
+
+            if (statusSelect && rejectReason) {
+                statusSelect.addEventListener("change", function () {
+                    if (!statusSelect.value.includes("rejected")) {
+                        rejectReason.classList.add("hidden");
+                    } else {
+                        rejectReason.classList.remove("hidden");
+                    }
+                });
+
+                if (statusSelect.value.includes("rejected")) {
+                    rejectReason.classList.remove("hidden");
+                } else {
+                    rejectReason.classList.add("hidden");
+                }
+            }
+        });
+
+
+        FilePond.registerPlugin(FilePondPluginImagePreview, FilePondPluginFileValidateType);
+        // Get a reference to the file input element
+        const inputElement = document.querySelector('#neFilepond');
+
+        const labels_pt_BR = {
+            // labelIdle: 'Drag & Drop your files or <span class="filepond--label-action"> Browse </span>'
+            labelIdle: '拖拽图片或 <span class="filepond--label-action"> 点击上传 </span>',
+            // labelInvalidField: 'Field contains invalid files',
+            labelInvalidField: 'Arquivos inválidos',
+            // labelFileWaitingForSize: 'Waiting for size',
+            labelFileWaitingForSize: 'Calculando o tamanho do arquivo',
+            // labelFileSizeNotAvailable: 'Size not available',
+            labelFileSizeNotAvailable: 'Tamanho do arquivo indisponível',
+            // labelFileLoading: 'Loading',
+            labelFileLoading: 'Carregando',
+            // labelFileLoadError: 'Error during load',
+            labelFileLoadError: 'Erro durante o carregamento',
+            // labelFileProcessing: 'Uploading',
+            labelFileProcessing: 'Enviando',
+            // labelFileProcessingComplete: 'Upload complete',
+            labelFileProcessingComplete: 'Envio finalizado',
+            // labelFileProcessingAborted: 'Upload cancelled',
+            labelFileProcessingAborted: 'Envio cancelado',
+            // labelFileProcessingError: 'Error during upload',
+            labelFileProcessingError: 'Erro durante o envio',
+            // labelFileProcessingRevertError: 'Error during revert',
+            labelFileProcessingRevertError: 'Erro ao reverter o envio',
+            // labelFileRemoveError: 'Error during remove',
+            labelFileRemoveError: 'Erro ao remover o arquivo',
+            // labelTapToCancel: 'tap to cancel',
+            labelTapToCancel: 'clique para cancelar',
+            // labelTapToRetry: 'tap to retry',
+            labelTapToRetry: 'clique para reenviar',
+            // labelTapToUndo: 'tap to undo',
+            labelTapToUndo: 'clique para desfazer',
+            // labelButtonRemoveItem: 'Remove',
+            labelButtonRemoveItem: 'Remover',
+            // labelButtonAbortItemLoad: 'Abort',
+            labelButtonAbortItemLoad: 'Abortar',
+            // labelButtonRetryItemLoad: 'Retry',
+            labelButtonRetryItemLoad: 'Reenviar',
+            // labelButtonAbortItemProcessing: 'Cancel',
+            labelButtonAbortItemProcessing: 'Cancelar',
+            // labelButtonUndoItemProcessing: 'Undo',
+            labelButtonUndoItemProcessing: 'Desfazer',
+            // labelButtonRetryItemProcessing: 'Retry',
+            labelButtonRetryItemProcessing: 'Reenviar',
+            // labelButtonProcessItem: 'Upload',
+            labelButtonProcessItem: 'Enviar',
+            // labelMaxFileSizeExceeded: 'File is too large',
+            labelMaxFileSizeExceeded: 'Arquivo é muito grande',
+            // labelMaxFileSize: 'Maximum file size is {filesize}',
+            labelMaxFileSize: 'O tamanho máximo permitido: {filesize}',
+            // labelMaxTotalFileSizeExceeded: 'Maximum total size exceeded',
+            labelMaxTotalFileSizeExceeded: 'Tamanho total dos arquivos excedido',
+            // labelMaxTotalFileSize: 'Maximum total file size is {filesize}',
+            labelMaxTotalFileSize: 'Tamanho total permitido: {filesize}',
+            // labelFileTypeNotAllowed: 'File of invalid type',
+            labelFileTypeNotAllowed: 'Tipo de arquivo inválido',
+            // fileValidateTypeLabelExpectedTypes: 'Expects {allButLastType} or {lastType}',
+            fileValidateTypeLabelExpectedTypes: 'Tipos de arquivo suportados são {allButLastType} ou {lastType}',
+            // imageValidateSizeLabelFormatError: 'Image type not supported',
+            imageValidateSizeLabelFormatError: 'Tipo de imagem inválida',
+            // imageValidateSizeLabelImageSizeTooSmall: 'Image is too small',
+            imageValidateSizeLabelImageSizeTooSmall: 'Imagem muito pequena',
+            // imageValidateSizeLabelImageSizeTooBig: 'Image is too big',
+            imageValidateSizeLabelImageSizeTooBig: 'Imagem muito grande',
+            // imageValidateSizeLabelExpectedMinSize: 'Minimum size is {minWidth} × {minHeight}',
+            imageValidateSizeLabelExpectedMinSize: 'Tamanho mínimo permitida: {minWidth} × {minHeight}',
+            // imageValidateSizeLabelExpectedMaxSize: 'Maximum size is {maxWidth} × {maxHeight}',
+            imageValidateSizeLabelExpectedMaxSize: 'Tamanho máximo permitido: {maxWidth} × {maxHeight}',
+            // imageValidateSizeLabelImageResolutionTooLow: 'Resolution is too low',
+            imageValidateSizeLabelImageResolutionTooLow: 'Resolução muito baixa',
+            // imageValidateSizeLabelImageResolutionTooHigh: 'Resolution is too high',
+            imageValidateSizeLabelImageResolutionTooHigh: 'Resolução muito alta',
+            // imageValidateSizeLabelExpectedMinResolution: 'Minimum resolution is {minResolution}',
+            imageValidateSizeLabelExpectedMinResolution: 'Resolução mínima permitida: {minResolution}',
+            // imageValidateSizeLabelExpectedMaxResolution: 'Maximum resolution is {maxResolution}'
+            imageValidateSizeLabelExpectedMaxResolution: 'Resolução máxima permitida: {maxResolution}'
+        };
+
+        FilePond.setOptions({
+            labelIdle: '拖拽图片或 <span class="filepond--label-action"> 点击上传 </span>'
+        })
+
+        // Create a FilePond instance
+        setTimeout(() => {
+            const pond = FilePond.create(inputElement, {
+                required: true,
+                storeAsFile: true,
+                instantUpload: false,
+                maxFiles: 7,
+                acceptedFileTypes: ['image/*'],
+
+                onaddfile(error, file) {
+                    console.log(file)
+                },
+                onremovefile(error, file) {
+                    const filename = file.filenameWithoutExtension
+                    const input = document.querySelector(`input[value="${filename}"]`)
+                    if (input) {
+                        input.remove()
+                    }
+                }
+            });
+
+            const existing_images = {{ existing_images|default:'[]'|safe }}
+            console.log(existing_images)
+            if (existing_images.length) {
+                {#pond.addFiles(existing_images.map(image => ({#}
+                {#        source: image.url,#}
+                {#        options: {#}
+                {#            type: 'local',#}
+                {#            metadate: {#}
+                {#                id: image.id#}
+                {#            }#}
+                {#        }#}
+                {#    }))#}
+                {#)#}
+                existing_images.forEach(image => {
+                    pond.addFile(image.url, {
+                        metadata: {
+                            id: image.id,
+                            filename: image.filename,
+                        }
+                    })
+                })
+            }
+        }, 200)
+    </script>
+{% endblock %}

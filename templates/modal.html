@@ -1,0 +1,355 @@
+{% extends 'base.html' %}
+
+
+{% block css %}
+  <style>
+  :root {
+  --swiper-theme-color: #10b981;
+  --swiper-pagination-bullet-size: 12px;
+  }
+  </style>
+{% endblock %}
+
+{% block content %}
+
+{% endblock %}
+
+{% block modal %}
+<button 
+  data-dialog-target="image-dialog"
+    id="openModalBtn"
+  class="hidden rounded-md bg-slate-800 py-2 px-4 border border-transparent text-center text-sm text-white transition-all shadow-md hover:shadow-lg focus:bg-slate-700 focus:shadow-none active:bg-slate-700 hover:bg-slate-700 active:shadow-none disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none ml-2" type="button">
+    弹框
+</button>
+
+<div
+  data-dialog-backdrop="image-dialog"
+  data-dialog-backdrop-close="true"
+  class="pointer-events-none fixed inset-0 z-[999] grid h-screen w-screen place-items-center bg-black bg-opacity-60 opacity-0 backdrop-blur-sm transition-opacity duration-300"
+    id="neModal"
+>
+  <div
+    class="relative m-4 w-3/4 max-w-screen-lg rounded-lg bg-white shadow-sm"
+    role="dialog"
+    data-dialog="image-dialog"
+      id="neDialogBox"
+  >
+    <div class="flex items-center justify-between p-4">
+      <div class="flex items-center gap-3">
+        <img
+          alt="Logo"
+          src=""
+          class="relative inline-block h-9 w-9 rounded-full object-cover object-center"
+          id="neUserAvatar"
+        />
+        <div class="-mt-px flex flex-col">
+          <p class="text-sm text-slate-800 font-medium" id="neAuthor">
+          </p>
+          <p class="text-xs font-normal text-slate-500 hidden">
+            @andrew
+          </p>
+        </div>
+      </div>
+      <div class="flex items-center gap-2">
+        {# <button data-ripple-light="true" class="rounded-md border border-transparent p-2.5 text-center text-sm transition-all text-slate-600 hover:bg-slate-100 focus:bg-slate-100 active:bg-slate-100 disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none" type="button"> #}
+        {#   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-4 h-4"> #}
+        {#     <path d="m11.645 20.91-.007-.003-.022-.012a15.247 15.247 0 0 1-.383-.218 25.18 25.18 0 0 1-4.244-3.17C4.688 15.36 2.25 12.174 2.25 8.25 2.25 5.322 4.714 3 7.688 3A5.5 5.5 0 0 1 12 5.052 5.5 5.5 0 0 1 16.313 3c2.973 0 5.437 2.322 5.437 5.25 0 3.925-2.438 7.111-4.739 9.256a25.175 25.175 0 0 1-4.244 3.17 15.247 15.247 0 0 1-.383.219l-.022.012-.007.004-.003.001a.752.752 0 0 1-.704 0l-.003-.001Z" /> #}
+        {#   </svg> #}
+        {# </button> #}
+
+          <p class="text-slate-800 font-medium" id="copyCount"></p>
+        <button id="copyDesBtn" data-clipboard-text="" data-ripple-light="true" class="copyBtn flex items-center rounded-md bg-slate-800 py-2 px-4 border border-transparent text-center text-sm text-white transition-all shadow-md hover:shadow-lg focus:bg-slate-700 focus:shadow-none active:bg-slate-700 hover:bg-slate-700 active:shadow-none disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none gap-1" type="button">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4">
+        <path stroke-linecap="round" stroke-linejoin="round"
+          d="M15.75 17.25v3.375c0 .621-.504 1.125-1.125 1.125h-9.75a1.125 1.125 0 01-1.125-1.125V7.875c0-.621.504-1.125 1.125-1.125H6.75a9.06 9.06 0 011.5.124m7.5 10.376h3.375c.621 0 1.125-.504 1.125-1.125V11.25c0-4.46-3.243-8.161-7.5-8.876a9.06 9.06 0 00-1.5-.124H9.375c-.621 0-1.125.504-1.125 1.125v3.5m7.5 10.375H9.375a1.125 1.125 0 01-1.125-1.125v-9.25m12 6.625v-1.875a3.375 3.375 0 00-3.375-3.375h-1.5a1.125 1.125 0 01-1.125-1.125v-1.5a3.375 3.375 0 00-3.375-3.375H9.75">
+        </path>
+            </svg>
+
+
+  {# <path stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 6 6 9-13.5" /> #}
+            复制描述词
+        </button>
+      </div>
+    </div>
+    <div class="relative border-b border-t border-b-blue-gray-100 border-t-blue-gray-100 p-4 font-sans text-base font-light leading-relaxed text-blue-gray-500 antialiased flex justify-center gap-4">
+              <div style="width: 45vh;" class="min-w-60 relative bg-gray-100 rounded-lg overflow-hidden hover:shadow-xl duration-300 transition-all ease-in-out">
+                <div class="swiper default-carousel-modal swiper-container" id="my-gallery">
+                  <div class="swiper-wrapper swiper-wrapper-modal">
+                    {# <div class="swiper-slide"> #}
+                    {#   <div class="bg-indigo-50 rounded-2xl h-96 flex justify-center items-center"> #}
+                    {#     <span class="text-3xl font-semibold text-indigo-600">Slide 1 </span> #}
+                    {#   </div> #}
+                    {# </div> #}
+                    {# <div class="swiper-slide"> #}
+                    {#   <div class="bg-indigo-50 rounded-2xl h-96 flex justify-center items-center"> #}
+                    {#     <span class="text-3xl font-semibold text-indigo-600">Slide 2 </span> #}
+                    {#   </div> #}
+                    {# </div> #}
+                    {# <div class="swiper-slide"> #}
+                    {#   <div class="bg-indigo-50 rounded-2xl h-96 flex justify-center items-center"> #}
+                    {#     <span class="text-3xl font-semibold text-indigo-600">Slide 3 </span> #}
+                    {#   </div> #}
+                    {# </div> #}
+                  </div>
+                  <div class="flex items-center gap-8 lg:justify-start justify-center">
+          {#           <button class="ne-slider-prev"><svg #}
+          {#   xmlns="http://www.w3.org/2000/svg" #}
+          {#   fill="none" #}
+          {#   viewBox="0 0 24 24" #}
+          {#   stroke-width="2" #}
+          {#   stroke="currentColor" #}
+          {#   className="h-6 w-6" #}
+          {# > #}
+          {#   <path #}
+          {#     strokeLinecap="round" #}
+          {#     strokeLinejoin="round" #}
+          {#     d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" #}
+          {#   /> #}
+          {# </svg></button> #}
+          {#           <button class="ne-slider-next"><svg #}
+          {#   xmlns="http://www.w3.org/2000/svg" #}
+          {#   fill="none" #}
+          {#   viewBox="0 0 24 24" #}
+          {#   stroke-width="2" #}
+          {#   stroke="currentColor" #}
+          {#   className="h-6 w-6" #}
+          {# > #}
+          {#   <path #}
+          {#     strokeLinecap="round" #}
+          {#     strokeLinejoin="round" #}
+          {#     d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" #}
+          {#   /> #}
+          {# </svg></button> #}
+                    <button class="swiper-button-prev group !p-2 flex justify-center items-center !w-12 !h-12 transition-all duration-500 rounded !top-2/4 !-translate-y-8 !left-5 hover:bg-gray-200/30 after:content-none" data-carousel-prev>
+                <svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke-width="2"
+            stroke="currentColor"
+            class="h-6 w-6"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18"
+            />
+          </svg>
+                    </button>
+                    <button class="swiper-button-next group !p-2 flex justify-center items-center !w-12 !h-12 transition-all duration-500 rounded !top-2/4 !-translate-y-8 !right-5 hover:bg-gray-200/30 after:content-none" data-carousel-next>
+                <svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke-width="2"
+            stroke="currentColor"
+            class="h-6 w-6"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3"
+            />
+          </svg>
+                    </button>
+                  </div>
+                <div class="swiper-pagination"></div>
+                </div>
+              </div>
+
+        <div class="min-w-64 max-h-96 overflow-auto max-w-lg bg-gray-100 p-4 rounded-lg hover:shadow-xl duration-300 transition-all ease-in-out">
+          <p id="nePrompt" class="pb-2 select-none"></p>
+          <p id="neCNPrompt" class="border-t border-slate-200 pt-2 select-none"></p>
+        </div>
+    </div>
+    <div class="flex shrink-0 flex-wrap items-center justify-between p-4 text-blue-gray-500">
+      <div class="flex items-center gap-16">
+        <div>
+          <p class="text-slate-500 text-xs lg:text-sm flex items-center gap-1">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-4">
+  <path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z" />
+  <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+</svg>
+
+              观看量
+          </p>
+          <p class="text-slate-800 font-medium text-xs md:text-sm lg:text-base" id="neViewCount">
+          </p>
+        </div>
+        <div class="hidden">
+          <p class="text-slate-500 text-xs lg:text-sm  flex items-center gap-1">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-4">
+  <path stroke-linecap="round" stroke-linejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12Z" />
+</svg>
+              点赞量
+
+          </p>
+          <p class="text-slate-800 font-medium text-xs md:text-sm lg:text-base" id="neLikeCount">
+          </p>
+        </div>
+        <div>
+          <p class="text-slate-500 text-xs lg:text-sm flex items-center gap-1">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-4">
+  <path stroke-linecap="round" stroke-linejoin="round" d="M9.568 3H5.25A2.25 2.25 0 0 0 3 5.25v4.318c0 .597.237 1.17.659 1.591l9.581 9.581c.699.699 1.78.872 2.607.33a18.095 18.095 0 0 0 5.223-5.223c.542-.827.369-1.908-.33-2.607L11.16 3.66A2.25 2.25 0 0 0 9.568 3Z" />
+  <path stroke-linecap="round" stroke-linejoin="round" d="M6 6h.008v.008H6V6Z" />
+</svg>
+              分类
+          </p>
+          <p class="text-slate-800 font-medium text-xs md:text-sm lg:text-base" id="neCategory">
+          </p>
+        </div>
+        <div>
+          <p class="text-slate-500 text-xs lg:text-sm flex items-center gap-1">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-4">
+  <path stroke-linecap="round" stroke-linejoin="round" d="M9.53 16.122a3 3 0 0 0-5.78 1.128 2.25 2.25 0 0 1-2.4 2.245 4.5 4.5 0 0 0 8.4-2.245c0-.399-.078-.78-.22-1.128Zm0 0a15.998 15.998 0 0 0 3.388-1.62m-5.043-.025a15.994 15.994 0 0 1 1.622-3.395m3.42 3.42a15.995 15.995 0 0 0 4.764-4.648l3.876-5.814a1.151 1.151 0 0 0-1.597-1.597L14.146 6.32a15.996 15.996 0 0 0-4.649 4.763m3.42 3.42a6.776 6.776 0 0 0-3.42-3.42" />
+</svg>
+
+              风格
+          </p>
+          <p class="text-slate-800 font-medium text-xs md:text-sm lg:text-base" id="neStyle">
+          </p>
+        </div>
+        <div>
+          <p class="text-slate-500 text-xs lg:text-sm flex items-center gap-1">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-4">
+  <path stroke-linecap="round" stroke-linejoin="round" d="M9 17.25v1.007a3 3 0 0 1-.879 2.122L7.5 21h9l-.621-.621A3 3 0 0 1 15 18.257V17.25m6-12V15a2.25 2.25 0 0 1-2.25 2.25H5.25A2.25 2.25 0 0 1 3 15V5.25m18 0A2.25 2.25 0 0 0 18.75 3H5.25A2.25 2.25 0 0 0 3 5.25m18 0V12a2.25 2.25 0 0 1-2.25 2.25H5.25A2.25 2.25 0 0 1 3 12V5.25" />
+</svg>
+              软件
+          </p>
+          <p class="text-slate-800 font-medium text-xs md:text-sm lg:text-base" id="neSoftware">
+          </p>
+        </div>
+        <div>
+          <p class="text-slate-500 text-xs lg:text-sm flex items-center gap-1">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-4">
+  <path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 0 1 2.25-2.25h13.5A2.25 2.25 0 0 1 21 7.5v11.25m-18 0A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75m-18 0v-7.5A2.25 2.25 0 0 1 5.25 9h13.5A2.25 2.25 0 0 1 21 11.25v7.5m-9-6h.008v.008H12v-.008ZM12 15h.008v.008H12V15Zm0 2.25h.008v.008H12v-.008ZM9.75 15h.008v.008H9.75V15Zm0 2.25h.008v.008H9.75v-.008ZM7.5 15h.008v.008H7.5V15Zm0 2.25h.008v.008H7.5v-.008Zm6.75-4.5h.008v.008h-.008v-.008Zm0 2.25h.008v.008h-.008V15Zm0 2.25h.008v.008h-.008v-.008Zm2.25-4.5h.008v.008H16.5v-.008Zm0 2.25h.008v.008H16.5V15Z" />
+</svg>
+              更新时间
+          </p>
+          <p class="text-slate-800 font-medium text-xs md:text-sm lg:text-base" id="neUpdated">
+          </p>
+        </div>
+      </div>
+        <button data-clipboard-text="1111111" data-ripple-light="true" class="hidden copyBtn flex items-center select-none gap-2 rounded-md border border-slate-300 py-2 px-4 text-center text-sm transition-all shadow-sm hover:shadow-lg text-slate-600 hover:text-white hover:bg-slate-800 hover:border-slate-800 focus:text-white focus:bg-slate-800 focus:border-slate-800 active:border-slate-800 active:text-white active:bg-slate-800 disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none" type="button">
+
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4">
+  <path stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 6 6 9-13.5" />
+</svg>
+
+
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"
+        aria-hidden="true" class="w-4 h-4">
+        <path stroke-linecap="round" stroke-linejoin="round"
+          d="M15.75 17.25v3.375c0 .621-.504 1.125-1.125 1.125h-9.75a1.125 1.125 0 01-1.125-1.125V7.875c0-.621.504-1.125 1.125-1.125H6.75a9.06 9.06 0 011.5.124m7.5 10.376h3.375c.621 0 1.125-.504 1.125-1.125V11.25c0-4.46-3.243-8.161-7.5-8.876a9.06 9.06 0 00-1.5-.124H9.375c-.621 0-1.125.504-1.125 1.125v3.5m7.5 10.375H9.375a1.125 1.125 0 01-1.125-1.125v-9.25m12 6.625v-1.875a3.375 3.375 0 00-3.375-3.375h-1.5a1.125 1.125 0 01-1.125-1.125v-1.5a3.375 3.375 0 00-3.375-3.375H9.75">
+        </path>
+      </svg>
+          分享链接
+</button>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block js %}
+<script>
+  // todo 打开modal需要更新复制量
+  let clipboard = new ClipboardJS('#copyDesBtn');
+
+  document.querySelector('#copyDesBtn').addEventListener('mouseleave', (e) => {
+    e.currentTarget.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 17.25v3.375c0 .621-.504 1.125-1.125 1.125h-9.75a1.125 1.125 0 01-1.125-1.125V7.875c0-.621.504-1.125 1.125-1.125H6.75a9.06 9.06 0 011.5.124m7.5 10.376h3.375c.621 0 1.125-.504 1.125-1.125V11.25c0-4.46-3.243-8.161-7.5-8.876a9.06 9.06 0 00-1.5-.124H9.375c-.621 0-1.125.504-1.125 1.125v3.5m7.5 10.375H9.375a1.125 1.125 0 01-1.125-1.125v-9.25m12 6.625v-1.875a3.375 3.375 0 00-3.375-3.375h-1.5a1.125 1.125 0 01-1.125-1.125v-1.5a3.375 3.375 0 00-3.375-3.375H9.75"></path></svg>复制描述词'
+  })
+
+  clipboard.on('success', function (e) {
+    console.info('Action:', e.action);
+    console.info('Text:', e.text);
+    console.info('Trigger:', e.trigger);
+
+    e.trigger.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4"><path stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 6 6 9-13.5" /></svg>已复制'
+    e.clearSelection();
+
+    const id = document.querySelector('#neDialogBox').getAttribute('data-id')
+
+    fetch(`/image/update-copy-count/${id}`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-CSRFToken': '{{ csrf_token }}',
+      }
+    })
+    .then(response => response.json())
+      .then(data => {
+        document.querySelector("#copyCount").innerHTML = data.copy_count
+      })
+  })
+
+  var swiper = new Swiper(".default-carousel-modal", {
+    loop: false,
+    slidesPerView: 1,
+    spaceBetween: 0,
+    pagination: {
+      el: ".swiper-pagination",
+      clickable: true,
+      dynamicBullets: false,
+      dynamicMainBullets: 1,
+    },
+    navigation: {
+      nextEl: ".swiper-button-next",
+      prevEl: ".swiper-button-prev",
+    },
+  });
+
+  function onImageClicked(id, prompt, cnPrompt, images, author, updated, viewCount, likeCount, copyCount, category, style, software) {
+    const aImgHtml = images.map(src => {
+      return `<div class="swiper-slide"><a data-fslightbox="gallery" href="${src}"><img draggable="false" oncontextmenu="return false;" class="object-cover object-center" src="${src}" loading="lazy" /></a><div class="swiper-lazy-preloader"></div></div>`
+    })
+    document.querySelector('.swiper-wrapper-modal').innerHTML = aImgHtml.join('')
+
+    swiper.update()
+    swiper.slideTo(0)
+
+    document.querySelector("#neDialogBox").setAttribute('data-id', id)
+    document.querySelector("#nePrompt").innerHTML = prompt
+    document.querySelector("#neCNPrompt").innerHTML = cnPrompt
+    if (author?.user) {
+      document.querySelector("#neUserAvatar").src = author?.user.avatar
+      document.querySelector("#neAuthor").innerHTML = author?.user.name
+    } else {
+      document.querySelector("#neAuthor").innerHTML = author.name
+      document.querySelector("#neUserAvatar").src = '/media/default.jpg'
+    }
+    document.querySelector("#neUpdated").innerHTML = updated
+    document.querySelector("#neViewCount").innerHTML = viewCount
+    document.querySelector("#neLikeCount").innerHTML = likeCount
+    document.querySelector("#copyDesBtn").setAttribute("data-clipboard-text", `${prompt}\n${cnPrompt}`)
+    document.querySelector("#copyCount").innerHTML = copyCount
+    document.querySelector("#neCategory").innerHTML = category
+    document.querySelector("#neStyle").innerHTML = style
+    document.querySelector("#neSoftware").innerHTML = software
+
+    refreshFsLightbox()
+
+    // const gallery = document.querySelectorAll('[data-fslightbox="gallery"]')
+    // ;[...gallery].map(img => img.addEventListener('click', () => {
+    //   setTimeout(() => {
+    //   [...document.querySelectorAll(".fslightbox-source")].map(img => img.setAttribute("oncontextmenu", "return false;"))
+    //   }, 200)
+    // }))
+
+
+    fetch(`/image/update-view-count/${id}`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-CSRFToken': '{{ csrf_token }}',
+      }
+    })
+    .then(response => response.json())
+      .then(data => {
+        document.querySelector("#neViewCount").innerHTML = data.views
+      })
+
+    document.querySelector('#openModalBtn').click()
+  }
+
+</script>
+{% endblock %}

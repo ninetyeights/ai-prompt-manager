@@ -1,0 +1,255 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block css %}
+    <!-- <link href="https://unpkg.com/filepond@^4/dist/filepond.css" rel="stylesheet" /> -->
+    <link href="https://unpkg.com/filepond/dist/filepond.css" rel="stylesheet"/>
+    <link
+            href="https://unpkg.com/filepond-plugin-image-preview/dist/filepond-plugin-image-preview.css"
+            rel="stylesheet"
+    />
+{% endblock %}
+
+{% block content %}
+    <div class="w-full">
+        <div class="relative right-0">
+            <ul class="relative flex flex-wrap py-1.5 mb-2 list-none rounded-md bg-slate-100" data-tabs="tabs"
+                role="list">
+                <li class="z-30 flex-auto text-center">
+                    <a class="z-30 flex items-center justify-center w-full px-0 py-2 text-sm mb-0 transition-all ease-in-out border-0 rounded-md cursor-pointer text-slate-600 {% if request.GET.status == 'all' or not request.GET.status %} bg-white shadow{% endif %}"
+                       href="{% url 'authentication:my_upload' %}?status=all"
+                    >
+                        全部 {{ all_count }}
+                    </a>
+                </li>
+                <li class="z-30 flex-auto text-center">
+                    <a class="z-30 flex items-center justify-center w-full px-0 py-2 mb-0 text-sm transition-all ease-in-out border-0 rounded-lg cursor-pointer text-slate-600 {% if request.GET.status == 'pending' %} bg-white shadow{% endif %}"
+                       href="{% url 'authentication:my_upload' %}?status=pending"
+                    >
+                        待审核 {{ pending_count }}
+                    </a>
+                </li>
+                <li class="z-30 flex-auto text-center">
+                    <a class="z-30 flex items-center justify-center w-full px-0 py-2 text-sm mb-0 transition-all ease-in-out border-0 rounded-lg cursor-pointer text-slate-700 {% if request.GET.status == 'approved' %} bg-white shadow{% endif %}"
+                       href="{% url 'authentication:my_upload' %}?status=approved"
+                    >
+                        审核通过 {{ approved_count }}
+                    </a>
+                </li>
+                <li class="z-30 flex-auto text-center">
+                    <a class="z-30 flex items-center justify-center w-full px-0 py-2 text-sm mb-0 transition-all ease-in-out border-0 rounded-lg cursor-pointer text-slate-700 {% if request.GET.status == 'rejected' %} bg-white shadow{% endif %}"
+                       href="{% url 'authentication:my_upload' %}?status=rejected"
+                    >
+                        已拒绝 {{ rejected_count }}
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="relative flex flex-col rounded-lg bg-white shadow-sm border border-slate-200">
+        {% if data.paginator.count == 0 %}
+            <h3 class="text-center text-4xl mt-8">没有数据</h3>
+            <img src="{% static '404.svg' %}" alt="empty" class="w-full h-auto">
+        {% endif %}
+
+        <div class="flex flex-col divide-y divide-slate-200">
+            <!-- 列表项 -->
+            {% for item in data %}
+                <div class="flex items-start p-3" id="item-{{ item.id }}">
+                    <!-- 图片网格列 -->
+                    <div class="grid grid-cols-{% if item.images.all.count == 1 %}1{% elif item.images.all.count == 2 %}2{% else %}3{% endif %} gap-2 w-64 h-auto{% if item.images.all.count >= 3 %} min-w-64{% else %} min-w-32{% endif %}">
+                        {% for img in item.images.all %}
+                            <a data-fslightbox="gallery" href="{{ img.thumbnail_large.url }}"><img
+                                    src="{{ img.thumbnail.url }}"
+                                    alt="{{ item.prompt }}"
+                                    class="w-full max-w-32 object-cover rounded"></a>
+                        {% endfor %}
+                    </div>
+
+                    <!-- 内容列 -->
+                    <div class="ml-4 flex-grow">
+                        <!-- 长文字 -->
+                        <div class="text-slate-800 text-sm leading-relaxed line-clamp-3">
+                            {{ item.cn_prompt }}
+                        </div>
+                        <!-- 其他信息 -->
+                        <div class="mt-2 flex flex-wrap text-xs text-slate-500">
+                            <span class="mr-4">生成人员: <span
+                                    class="font-medium text-slate-700">{{ item.author }}</span></span>
+                            <span class="mr-4">分类: <span class="font-medium text-slate-700">{{ item.category }}</span></span>
+                            <span class="mr-4">风格: <span
+                                    class="font-medium text-slate-700">{{ item.style }}</span></span>
+                            <span class="mr-4">软件: <span class="font-medium text-slate-700">{{ item.software }}</span></span>
+
+                        </div>
+
+                        <div class="mt-2 flex flex-wrap text-xs text-slate-500">
+                            <span>审核状态: {% if item.status == 'approved' %}
+                                <span class="font-medium text-green-600">审核通过</span>{% if item.reviewed_at %} 审核日期:
+                                    <span
+                                            class="font-medium text-slate-700 relative-date">{{ item.reviewed_at | date:'Y-m-d H:i:s' }}</span>{% endif %}{% elif item.status == 'rejected' %}
+                                <span class="font-medium text-red-600">已拒绝</span>{% if item.reviewed_at %} 审核日期:
+                                    <span
+                                            class="font-medium text-slate-700 relative-date">{{ item.reviewed_at | date:'Y-m-d H:i:s' }}</span>{% endif %}{% else %}
+                                <span class="font-medium text-blue-600">待审核</span>{% endif %}</span>
+                        </div>
+
+                        {% if item.status == 'rejected' %}
+                            <div class="mt-2 flex flex-wrap text-xs text-slate-500">
+                                <span>拒绝原因：</span><span class="text-red-500">{{ item.rejection_reason }}</span>
+                            </div>
+                        {% endif %}
+
+                        <div class="mt-2 flex flex-wrap text-xs text-slate-500">
+                            <span class="mr-4">创建日期: <span
+                                    class="font-medium text-slate-700 relative-date">{{ item.created_at | date:'Y-m-d H:i:s' }}</span></span>
+                        </div>
+
+                        <div class="mt-2 flex flex-wrap text-xs text-slate-500">
+                            <span class="mr-4">更新日期: <span
+                                    class="font-medium text-slate-700 relative-date">{{ item.updated_at | date:'Y-m-d H:i:s' }}</span></span>
+                        </div>
+                    </div>
+
+                    <!-- 操作按钮 -->
+                    <div class="flex flex-col min-w-32 ml-4">
+                        <a href="{% url 'image:update_item' item.id %}">
+                            <button
+                                    class="flex items-center justify-center w-full rounded-md border border-transparent p-2.5 text-center text-sm transition-all text-green-600 hover:bg-slate-200 active:bg-slate-200"
+                                    type="button">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                     stroke-width="1.5" stroke="currentColor" class="size-4 mr-1">
+                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                          d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L6.832 19.82a4.5 4.5 0 0 1-1.897 1.13l-2.685.8.8-2.685a4.5 4.5 0 0 1 1.13-1.897L16.863 4.487Zm0 0L19.5 7.125"/>
+                                </svg>
+                                修改
+                            </button>
+                        </a>
+                        <button
+                                class="flex items-center justify-center w-full rounded-md border border-transparent p-2.5 text-center text-sm transition-all text-red-600 hover:bg-slate-200 active:bg-slate-200"
+                                type="button"
+                                onclick="deleteItem({{ item.id }})">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                                 stroke="currentColor" class="size-4 mr-1">
+                                <path stroke-linecap="round" stroke-linejoin="round"
+                                      d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0"/>
+                            </svg>
+                            删除
+                        </button>
+                        {% if request.user.is_superuser %}
+                            <div class="flex">
+                                <a href="{% url 'image:approve_item' item.id %}?status={{ status }}">
+                                    <button class="flex items-center justify-center w-full text-nowrap rounded-md border border-transparent px-1.5 py-1 text-center text-sm transition-all text-green-600 hover:bg-slate-200 active:bg-slate-200"
+                                            type="button">
+                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                             stroke-width="1.5" stroke="currentColor" class="size-4 mr-0.5">
+                                            <path stroke-linecap="round" stroke-linejoin="round"
+                                                  d="m4.5 12.75 6 6 9-13.5"/>
+                                        </svg>
+                                        通过
+                                    </button>
+                                </a>
+                                {#                                <a href="{% url 'image:reject_item' item.id %}?status={{ status }}">#}
+                                <button class="flex items-center justify-center w-full text-nowrap rounded-md border border-transparent px-1.5 py-1 text-center text-sm transition-all text-red-600 hover:bg-slate-200 active:bg-slate-200"
+                                        type="button" onclick="rejectWithReason({{ item.id }})">
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                         stroke-width="1.5" stroke="currentColor" class="size-4 mr-0.5">
+                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                              d="M6 18 18 6M6 6l12 12"/>
+                                    </svg>
+                                    拒绝
+                                </button>
+                                {#                                </a>#}
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            {% endfor %}
+
+            {% if data.paginator.count %}
+                <div class="flex justify-center py-4">
+                    <div class="flex items-center gap-8">
+                        {% if data.has_previous %}
+                            <a href="?status={{ status }}&page={{ data.previous_page_number }}"
+                               class="rounded-md border border-slate-300 p-2.5 text-center text-sm transition-all shadow-sm hover:shadow-lg text-slate-600 hover:text-white hover:bg-slate-800 hover:border-slate-800 focus:text-white focus:bg-slate-800 focus:border-slate-800 active:border-slate-800 active:text-white active:bg-slate-800 disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none"
+                               type="button">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"
+                                     class="w-4 h-4">
+                                    <path fill-rule="evenodd"
+                                          d="M11.03 3.97a.75.75 0 0 1 0 1.06l-6.22 6.22H21a.75.75 0 0 1 0 1.5H4.81l6.22 6.22a.75.75 0 1 1-1.06 1.06l-7.5-7.5a.75.75 0 0 1 0-1.06l7.5-7.5a.75.75 0 0 1 1.06 0Z"
+                                          clip-rule="evenodd"/>
+                                </svg>
+                            </a>
+                        {% endif %}
+
+                        <p class="text-slate-600">
+                            第 <strong class="text-slate-800">{{ data.number }}</strong> 页，共 <strong
+                                class="text-slate-800">{{ data.paginator.num_pages }}</strong> 页
+                        </p>
+
+                        {% if data.has_next %}
+                            <a href="?status={{ status }}&page={{ data.next_page_number }}"
+                               class="rounded-md border border-slate-300 p-2.5 text-center text-sm transition-all shadow-sm hover:shadow-lg text-slate-600 hover:text-white hover:bg-slate-800 hover:border-slate-800 focus:text-white focus:bg-slate-800 focus:border-slate-800 active:border-slate-800 active:text-white active:bg-slate-800 disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none"
+                               type="button">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"
+                                     class="w-4 h-4">
+                                    <path fill-rule="evenodd"
+                                          d="M12.97 3.97a.75.75 0 0 1 1.06 0l7.5 7.5a.75.75 0 0 1 0 1.06l-7.5 7.5a.75.75 0 1 1-1.06-1.06l6.22-6.22H3a.75.75 0 0 1 0-1.5h16.19l-6.22-6.22a.75.75 0 0 1 0-1.06Z"
+                                          clip-rule="evenodd"/>
+                                </svg>
+                            </a>
+                        {% endif %}
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+{% endblock %}
+
+{% block js %}
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/fslightbox/3.4.2/index.min.js"
+            integrity="sha512-1DCtVD7ZP7vFEF3mBoGRE/zPMmobIVZ59wTOFshEFe2FxUvB+52xj6hfYV6Jn5yX9JaFFQMtaw6aKc1C8sdgig=="
+            crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    {#    <script src="https://unpkg.com/@material-tailwind/html@latest/scripts/tabs.js"></script>#}
+    <script>
+        function deleteItem(itemId) {
+
+            const confirmResult = confirm("确认要删除此项内容吗？")
+
+            if (!confirmResult) {
+                return
+            }
+
+            // 发起删除请求
+            fetch(`/image/delete-item/${itemId}/`, {
+                method: 'DELETE',
+                headers: {
+                    'X-CSRFToken': '{{ csrf_token }}', // 包含 CSRF token
+                },
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.message) {
+                        alert(data.message); // 删除成功提示
+                        document.getElementById(`item-${itemId}`).remove(); // 从页面移除元素
+                    } else if (data.error) {
+                        alert(data.error); // 显示错误信息
+                    }
+                })
+                .catch(error => console.error('Error:', error));
+        }
+
+        function rejectWithReason(itemId) {
+            const reason = prompt("请输入拒绝的原因")
+
+            if (reason === null || reason.trim() === "") {
+                return
+            }
+
+            window.location.href = "{% url 'image:reject_item' 0 %}".replace("0", itemId) + `?status={{ status }}&reason=${encodeURIComponent(reason)}`
+
+        }
+    </script>
+{% endblock %}
+

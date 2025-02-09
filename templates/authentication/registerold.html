@@ -1,0 +1,51 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<div class="container" style="max-width: 380px;">
+
+{% if messages %}
+  {% for message in messages %}
+    {% if message %}
+      <div class="alert alert-{{ message.tags }}"
+            role="alert">{{ message }}</div>
+    {% endif %}
+  {% endfor %}
+{% endif %}
+
+<h2 class="text-center">注册帐号</h2>
+
+<form method="post" action="{% url 'authentication:register' %}" novalidate>
+  {% csrf_token %}
+  {% for field in form %}
+    <div class="form-floating mb-3{% if field.errors %} is-invalid{% endif %}">
+      <input
+      type="{{ field.field.widget.input_type }}"
+      class="form-control{% if field.errors %} is-invalid{% endif %}"
+      id="{{ field.auto_id }}"
+      name="{{ field.name }}"
+      placeholder="{{ field.placeholder }}"
+      value="{% if field.value %}{{ field.value }}{% endif %}"
+      required
+      >
+      <label for="{{ field.auto_id }}">{{ field.label }}</label>
+    </div>
+
+    {% for error in field.errors %}
+      <div class="invalid-feedback mb-2">
+        {{ error|escape }}
+      </div>
+    {% endfor %}
+  {% endfor %}
+
+  <div class="d-grid gap-2 mb-3">
+    <button class="btn btn-primary" type="submit">注册</button>
+  </div>
+  <div class="d-flex">
+    <p>已有帐号？</p>
+    <a href="{% url 'authentication:login' %}">登录</a>
+  </div>
+</form>
+{% endblock %}
+
+</div>
