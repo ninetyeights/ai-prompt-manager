@@ -19,6 +19,25 @@
     {% if errors %}
         {{ errors }}
     {% endif %}
+    
+    <ul class="relative flex flex-wrap py-1.5 mb-2 list-none rounded-md bg-slate-100" data-tabs="tabs"
+                role="list">
+                <li class="z-30 flex-auto text-center">
+                    <a class="z-30 flex items-center justify-center w-full px-0 py-2 text-sm mb-0 transition-all ease-in-out border-0 rounded-md cursor-pointer text-slate-600 {% if request.GET.type == 'image' or not request.GET.type %} bg-white shadow{% endif %}"
+                       href="{% url 'image:add' %}?type=image"
+                    >
+                        图片+提示词
+                    </a>
+                </li>
+                <li class="z-30 flex-auto text-center">
+                    <a class="z-30 flex items-center justify-center w-full px-0 py-2 mb-0 text-sm transition-all ease-in-out border-0 rounded-lg cursor-pointer text-slate-600 {% if request.GET.type == 'text' %} bg-white shadow{% endif %}"
+                       href="{% url 'image:add' %}?type=text"
+                    >
+                        仅提示词
+                    </a>
+                </li>
+            </ul>
+    
     <form method="post" enctype="multipart/form-data">
         {% csrf_token %}
         <div class="gap-2 grid grid-cols-2 mb-4">

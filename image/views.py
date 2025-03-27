@@ -87,19 +87,13 @@ def delete_item(request, pk):
 @user_passes_test(is_staff_or_superuser, login_url='authentication:forbidden')
 def update_item(request, pk=None):
     instance = get_object_or_404(Item, pk=pk) if pk else None
-    # print(instance)
 
     if request.method == 'POST':
-        # print(request.POST)
-        # print(request.FILES)
 
         form = ItemForm(request.POST, instance=instance, user=request.user)
 
         images = request.FILES.getlist('image')
         existing_images = request.POST.getlist('existing_image_names', [])
-
-        # print(images)
-        # print(existing_images)
 
         if form.is_valid() and images:
             instance = form.save()
@@ -117,28 +111,6 @@ def update_item(request, pk=None):
 
                 image_instance = Image(item=instance, image=image)
                 image_instance.save()
-
-            # context = {
-            #     'item': instance,
-            #     'form': form,
-            #     'pk': pk,
-            #     'existing_images': [{
-            #         'id': image.id,
-            #         'filename': image.filename,
-            #         'size': image.image.size,
-            #         'url': request.build_absolute_uri(image.image.url)
-            #     }
-            #         for image in instance.images.all()] if instance else []
-            # }
-
-            # return render(request, 'image/update_item.html', context)
-            # item = form.save(commit=False)
-            # item.save()
-            # form.save_m2m()
-            #
-            # for image in images:
-            #     Image.objects.create(item=item, image=image)
-            #
             return redirect('authentication:my_upload')
 
             # existing_images = [{'id': image.id, 'url': request.build_absolute_uri(image.image.url)} for image in Image.objects.filter(item=item)]

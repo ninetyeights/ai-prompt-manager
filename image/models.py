@@ -137,6 +137,17 @@ class Item(models.Model):
     likes = models.PositiveIntegerField(default=0)
     copy_count = models.PositiveIntegerField(default=0)
 
+    INPUT_TYPE_CHOICES = [
+        ('text', '提示词'),
+        ('image', '图片+提示词')
+    ]
+    input_type = models.CharField(
+        max_length=10,
+        choices=INPUT_TYPE_CHOICES,
+        default='image',
+        verbose_name='类型'
+    )
+
     STATUS_CHOICES = [
         ('pending', '待审核'),
         ('approved', '审核通过'),

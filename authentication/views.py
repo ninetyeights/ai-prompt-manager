@@ -16,51 +16,51 @@ def is_staff_or_superuser(user):
 
 @login_required
 def homepage(request):
-    today = datetime.now().date()
-    yesterday = today - timedelta(days=1)
-    day_before_yesterday = today - timedelta(days=2)
-
-    today_items = Item.objects.filter(
-        is_deleted=False,
-        created_at__date=today,
-        status="approved"
-    ).order_by('-created_at').prefetch_related('images')
-
-    yesterday_items = Item.objects.filter(
-        is_deleted=False,
-        created_at__date=yesterday,
-        status="approved"
-    ).order_by('-created_at').prefetch_related('images')
-
-    day_before_yesterday_items = Item.objects.filter(
-        is_deleted=False,
-        created_at__date=day_before_yesterday,
-        status="approved"
-    ).order_by('-created_at').prefetch_related('images')
+    # today = datetime.now().date()
+    # yesterday = today - timedelta(days=1)
+    # day_before_yesterday = today - timedelta(days=2)
+    #
+    # today_items = Item.objects.filter(
+    #     is_deleted=False,
+    #     created_at__date=today,
+    #     status="approved"
+    # ).order_by('-created_at').prefetch_related('images')
+    #
+    # yesterday_items = Item.objects.filter(
+    #     is_deleted=False,
+    #     created_at__date=yesterday,
+    #     status="approved"
+    # ).order_by('-created_at').prefetch_related('images')
+    #
+    # day_before_yesterday_items = Item.objects.filter(
+    #     is_deleted=False,
+    #     created_at__date=day_before_yesterday,
+    #     status="approved"
+    # ).order_by('-created_at').prefetch_related('images')
 
     latest_items = Item.objects.filter(
         is_deleted=False,
         status="approved"
-    ).order_by('-created_at').prefetch_related('images')[:20]
+    ).order_by('-created_at').prefetch_related('images')
 
     software = Software.objects.all().prefetch_related('images')
 
     data = [
-        {
-            'date': today,
-            'label': '今日新增',
-            'items': today_items,
-        },
-        {
-            'date': yesterday,
-            'label': '昨日新增',
-            'items': yesterday_items,
-        },
-        {
-            'date': day_before_yesterday,
-            'label': '前天新增',
-            'items': day_before_yesterday_items
-        },
+        # {
+        #     'date': today,
+        #     'label': '今日新增',
+        #     'items': today_items,
+        # },
+        # {
+        #     'date': yesterday,
+        #     'label': '昨日新增',
+        #     'items': yesterday_items,
+        # },
+        # {
+        #     'date': day_before_yesterday,
+        #     'label': '前天新增',
+        #     'items': day_before_yesterday_items
+        # },
         {
             'date': None,
             'label': '最近上传',

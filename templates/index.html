@@ -69,8 +69,8 @@
             <section
                     class="border border-white rounded-md mb-4 py-2 px-4 lg:px-4 lg:py-4 bg-white hover:shadow-md transition-all ease-in-out duration-300">
                 <h2 class="block antialiased tracking-normal font-sans text-2xl font-semibold leading-snug !mb-2 text-primary">
-                    {{ item.label }}<span class="ml-2 text-base">{{ item.items.count }}张</span><span
-                        class="text-sm ml-2">{{ item.date }}</span>
+                    {{ item.label }}<span class="ml-2 text-base hidden">{{ item.items.count }}张</span><span
+                        class="text-sm ml-2 hidden">{{ item.date }}</span>
                 </h2>
                 <div class="grid grid-cols-4 gap-4">
                     {% for inner in item.items %}
