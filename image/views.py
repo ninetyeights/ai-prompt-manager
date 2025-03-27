@@ -6,6 +6,7 @@ from django.core.cache import cache
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.utils.timezone import now, localtime
 from zoneinfo import ZoneInfo
+from django.db.models import Q
 
 from .forms import ItemForm, ImageForm
 from .models import Item, Category, Image, Author
@@ -60,8 +61,19 @@ def update_view_count(request, pk):
 
 @login_required
 def category(request, pk):
-    data = Item.objects.filter(category__pk=pk, status="approved").order_by('-created_at')
     category = get_object_or_404(Category, pk=pk)
+
+    if category.parent is None:
+        subcategories = Category.objects.filter(Q(pk=category.pk) | Q(parent=category) | Q(parent__parent=category))
+        data = Item.objects.filter(
+            category__in=subcategories,
+            status="approved",
+        ).order_by('-created_at')
+    else:
+        data = Item.objects.filter(
+            category=category,
+            status="approved",
+        ).order_by('-created_at')
 
     return render(request, 'image/category.html', {
         'data': data,
